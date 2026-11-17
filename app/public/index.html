@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TelaDosGames • Telas Simultâneas e Voz em Tempo Real</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📺</text></svg>">
+</head>
+<body>
+
+  <!-- Barra de Notificação de Autoplay de Áudio -->
+  <div id="audioAutoplayPrompt" class="audio-prompt-banner" style="display: none;">
+    <span>🔊 Clique em qualquer lugar da tela para ativar o som dos participantes</span>
+    <button id="btnDismissAudioPrompt" class="btn-prompt-close">✕</button>
+  </div>
+
+  <!-- Topbar Minimalista -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="brand-section" id="navBrand" title="TelaDosGames">
+        <svg class="brand-logo" viewBox="0 0 32 32" aria-hidden="true">
+          <path fill-rule="evenodd" d="M5 4h22a4 4 0 0 1 4 4v13a4 4 0 0 1-4 4H5a4 4 0 0 1-4-4V8a4 4 0 0 1 4-4Zm8 6.5v8l7-4-7-4Z"/>
+          <rect x="10" y="27" width="12" height="2.5" rx="1.25"/>
+        </svg>
+        <span class="brand-text">Tela<span class="brand-dos">dos</span>Games</span>
+      </div>
+
+      <!-- Indicador da Sala Atual -->
+      <div id="topRoomPill" class="top-room-pill" title="Clique para copiar o link direto da sala">
+        <span id="topRoomDot" class="room-status-dot offline"></span>
+        <span id="topRoomName">Nenhuma sala ativa</span>
+      </div>
+    </div>
+
+    <div class="topbar-right">
+      <!-- Botão Copiar Link Direto para Amigos -->
+      <button id="btnQuickInvite" class="btn-top-invite" title="Copiar link direto para amigos entrarem em 1 clique">
+        <span>🔗</span> Convidar Amigo
+      </button>
+
+      <!-- Botão Conectar por IP -->
+      <button id="btnOpenRemoteModal" class="btn-top-secondary" title="Opções de conexão por IP local, VPN ou Cloudflare">
+        <span>🌐</span> Conexões / IP
+      </button>
+
+      <!-- Botão Gaveta de Salas -->
+      <button id="btnToggleRoomsDrawer" class="btn-top-secondary" title="Minhas Salas Salvas e Favoritos">
+        <span>☰</span> Minhas Salas
+      </button>
+
+      <!-- Perfil do Usuário / Login -->
+      <div id="userProfileBtn" class="user-profile-header" title="Entrar ou criar conta">
+        <div id="userAvatarHeader" class="user-avatar-sm">?</div>
+        <span id="userNameHeader" class="user-name-sm">Entrar</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Layout Principal (Palco 100% Imersivo) -->
+  <div class="app-stage-container">
+
+    <!-- PALCO CENTRAL DE TRANSMISSÃO E VOZ -->
+    <main class="stage-viewport">
+
+      <!-- Grade Dinâmica de Telas (Suporta telas simultâneas lado a lado) -->
+      <div id="streamGrid" class="stream-grid screens-0">
+
+        <!-- Saguão de Voz e Recepção (Exibido quando não há transmissão de tela ativa) -->
+        <div id="voiceLobbyPlaceholder" class="voice-lobby-clean">
+
+          <div class="lobby-header-box">
+            <div id="lobbyStatusBadge" class="lobby-badge">🟢 Sala Pronta</div>
+            <h1 id="currentRoomTitle">Selecione ou Crie uma Sala</h1>
+            <p id="currentRoomSubtitle">Clique no botão abaixo ou crie uma sala para conversar e transmitir a tela.</p>
+          </div>
+
+          <!-- Linha de Avatares dos Participantes Conectados na Sala -->
+          <div id="voiceAvatarsRow" class="voice-avatars-row">
+            <!-- Avatares com anel verde de fala são injetados aqui -->
+          </div>
+
+          <!-- Ações Rápidas no Centro do Palco -->
+          <div class="lobby-quick-actions">
+            <button id="lobbyBtnShareScreen" class="btn-lobby-primary">
+              <span>🖥️</span> Transmitir Minha Tela
+            </button>
+            <button id="lobbyBtnCopyLink" class="btn-lobby-secondary">
+              <span>🔗</span> Copiar Link para Amigo
+            </button>
+            <button id="lobbyBtnNewRoom" class="btn-lobby-secondary">
+              <span>➕</span> Criar Nova Sala
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Dock Flutuante Central (Estilo Discord / Google Meet) -->
+      <nav class="floating-dock">
+        <!-- Microfone -->
+        <button id="dockBtnMic" class="dock-action-btn" title="Ativar/Desativar Microfone">
+          <span id="dockIconMic">🎙️</span>
+          <span class="dock-tooltip">Microfone</span>
+        </button>
+
+        <!-- Ensurdecer (Ouvir) -->
+        <button id="dockBtnDeafen" class="dock-action-btn" title="Silenciar tudo (Deafen)">
+          <span id="dockIconDeafen">🎧</span>
+          <span class="dock-tooltip">Áudio</span>
+        </button>
+
+        <!-- Transmitir Tela -->
+        <button id="dockBtnScreen" class="dock-action-btn btn-dock-screenshare" title="Transmitir Tela (Ambos podem compartilhar juntos)">
+          <span id="dockIconScreen">🖥️</span>
+          <span class="dock-tooltip" id="dockTextScreen">Transmitir Tela</span>
+        </button>
+
+        <!-- Copiar Link Direto para Amigos -->
+        <button id="dockBtnCopy" class="dock-action-btn btn-dock-highlight" title="Copiar Link Direto da Sala">
+          <span>🔗</span>
+          <span class="dock-tooltip">Copiar Link</span>
+        </button>
+
+        <!-- Salvar Sala nos Favoritos -->
+        <button id="dockBtnBookmark" class="dock-action-btn" title="Salvar Sala nos Favoritos">
+          <span id="dockIconBookmark">⭐</span>
+          <span class="dock-tooltip">Salvar Sala</span>
+        </button>
+
+        <!-- Abrir/Fechar Chat Lateral -->
+        <button id="dockBtnChatToggle" class="dock-action-btn" title="Abrir Chat da Sala">
+          <span>💬</span>
+          <span id="chatUnreadDot" class="chat-unread-dot" style="display: none;"></span>
+          <span class="dock-tooltip">Chat</span>
+        </button>
+
+        <!-- Sair da Sala -->
+        <button id="dockBtnLeave" class="dock-action-btn btn-dock-leave" title="Sair da Sala">
+          <span>📞</span>
+          <span class="dock-tooltip">Sair</span>
+        </button>
+      </nav>
+
+    </main>
+
+    <!-- GAVETA LATERAL DIREITA: CHAT (Desliza suavemente sem poluir o palco) -->
+    <aside id="chatDrawer" class="side-drawer chat-drawer">
+      <div class="drawer-header">
+        <div class="drawer-title">
+          <span>💬</span> Chat em Tempo Real
+        </div>
+        <button id="btnCloseChatDrawer" class="btn-drawer-close" title="Fechar Chat">✕</button>
+      </div>
+
+      <div id="chatMessages" class="chat-messages-container">
+        <div class="chat-welcome-notice">
+          Início das mensagens desta sala. Converse por texto aqui!
+        </div>
+      </div>
+
+      <form id="chatForm" class="chat-input-box">
+        <input type="text" id="chatInput" placeholder="Mensagem na sala..." maxlength="280" autocomplete="off">
+        <button type="submit" class="btn-send-chat">Enviar</button>
+      </form>
+    </aside>
+
+    <!-- GAVETA LATERAL ESQUERDA: SALAS SALVAS E CONFIGURAÇÕES -->
+    <aside id="roomsDrawer" class="side-drawer rooms-drawer">
+      <div class="drawer-header">
+        <div class="drawer-title">
+          <span>📁</span> Minhas Salas
+        </div>
+        <div style="display: flex; gap: 6px;">
+          <button id="btnOpenCreateRoom" class="btn-drawer-action" title="Criar Nova Sala">+</button>
+          <button id="btnOpenJoinModal" class="btn-drawer-action" title="Entrar por ID">🔍</button>
+          <button id="btnCloseRoomsDrawer" class="btn-drawer-close" title="Fechar">✕</button>
+        </div>
+      </div>
+
+      <div id="savedRoomsList" class="saved-rooms-list">
+        <!-- Renderizado dinamicamente -->
+      </div>
+
+      <div class="drawer-footer">
+        <div class="user-profile-bar">
+          <div id="userAvatarSidebar" class="user-avatar-md">?</div>
+          <div class="user-text-info">
+            <span id="userNameSidebar" class="user-text-name">Visitante</span>
+            <span id="userStatusSidebar" class="user-text-status">Conectado</span>
+          </div>
+        </div>
+        <button id="btnLogout" class="btn-drawer-action" title="Sair da Conta" style="display: none;">🚪</button>
+      </div>
+    </aside>
+
+    <!-- Backdrop escuro para fechar gavetas ao clicar fora (mobile/overlay) -->
+    <div id="drawerBackdrop" class="drawer-backdrop" style="display: none;"></div>
+
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAIS (AUTENTICAÇÃO, CRIAR SALA, IP)      -->
+  <!-- ========================================== -->
+
+  <!-- Modal de Conexão com Amigos por IP / Link Direto -->
+  <div id="remoteModal" class="modal-backdrop" style="display: none;">
+    <div class="modal-content" style="max-width: 500px;">
+      <div class="modal-header">
+        <h2>🌐 Conectar por IP ou Link Direto</h2>
+        <button id="btnCloseRemoteModal" class="btn-icon-close">✕</button>
+      </div>
+
+      <p class="modal-description">
+        Escolha o melhor endereço para seus amigos. Ao clicar no link, eles entrarão <b>direto na sua sala sem precisar configurar nada</b>:
+      </p>
+
+      <div class="form-group">
+        <label>Modo de Conexão</label>
+        <select id="selectConnectionMode" class="form-input">
+          <option value="cloudflare">⚡ Link Cloudflare (Recomendado • Funciona pela Internet com 1 clique)</option>
+          <option value="lan">🏠 IP do Roteador / Rede Local (Wi-Fi / Cabo)</option>
+          <option value="vpn">🛡️ IP Radmin VPN (Rede Virtual Direta)</option>
+          <option value="public_ip">🌐 IP Público Direto (Internet)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Link Direto Gerado</label>
+        <div style="display: flex; gap: 8px;">
+          <input type="text" id="inputPublicUrl" class="form-input" readonly value="Carregando links...">
+          <button id="btnCopyPublicUrl" class="btn-modal-primary" style="white-space: nowrap; padding: 0 16px;">Copiar</button>
+        </div>
+        <span id="txtConnectionTip" class="connection-tip-text">
+          Carregando informações da rede...
+        </span>
+      </div>
+
+      <button id="btnCopyFullInvite" class="btn-modal-primary" style="margin-top: 8px;">
+        📋 Copiar Convite Completo para Enviar no WhatsApp / Discord
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal de Criação de Sala -->
+  <div id="createRoomModal" class="modal-backdrop" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Criar Sala de Transmissão</h2>
+        <button id="btnCloseCreateModal" class="btn-icon-close">✕</button>
+      </div>
+
+      <form id="formCreateRoom" style="display: flex; flex-direction: column; gap: 14px;">
+        <div class="form-group">
+          <label for="newRoomName">Nome da Sala</label>
+          <input type="text" id="newRoomName" class="form-input" placeholder="Ex: Gameplay com Amigos / Estudo" required>
+        </div>
+        <div class="form-group">
+          <label for="newRoomId">ID Personalizado</label>
+          <input type="text" id="newRoomId" class="form-input" placeholder="ex: amigos-jogos" required>
+        </div>
+        <div class="form-group">
+          <label for="newRoomPass">Senha da Sala (Opcional)</label>
+          <input type="password" id="newRoomPass" class="form-input" placeholder="Deixe vazio para sala aberta">
+        </div>
+        <button type="submit" class="btn-modal-primary">Criar e Entrar Agora</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal de Entrar por ID -->
+  <div id="joinModal" class="modal-backdrop" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Entrar em uma Sala Existente</h2>
+        <button id="btnCloseJoinModal" class="btn-icon-close">✕</button>
+      </div>
+
+      <form id="formJoinRoom" style="display: flex; flex-direction: column; gap: 14px;">
+        <div class="form-group">
+          <label for="joinRoomId">ID da Sala</label>
+          <input type="text" id="joinRoomId" class="form-input" placeholder="Digite o ID da sala" required>
+        </div>
+        <div class="form-group">
+          <label for="joinRoomPass">Senha (se houver)</label>
+          <input type="password" id="joinRoomPass" class="form-input" placeholder="Senha da sala">
+        </div>
+        <button type="submit" class="btn-modal-primary">Entrar na Sala</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal de Autenticação (Login / Cadastro) -->
+  <div id="authModal" class="modal-backdrop" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="authModalTitle">Acesse sua Conta</h2>
+        <button id="btnCloseAuthModal" class="btn-icon-close">✕</button>
+      </div>
+
+      <div class="modal-tabs">
+        <button id="tabBtnLogin" class="modal-tab-btn active">Entrar</button>
+        <button id="tabBtnRegister" class="modal-tab-btn">Cadastrar</button>
+      </div>
+
+      <!-- Login -->
+      <form id="formLogin" style="display: flex; flex-direction: column; gap: 12px;">
+        <div class="form-group">
+          <label for="loginUsername">Nome de Usuário</label>
+          <input type="text" id="loginUsername" class="form-input" placeholder="seu_usuario" required>
+        </div>
+        <div class="form-group">
+          <label for="loginPassword">Senha</label>
+          <input type="password" id="loginPassword" class="form-input" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn-modal-primary">Entrar</button>
+      </form>
+
+      <!-- Cadastro -->
+      <form id="formRegister" style="display: none; flex-direction: column; gap: 12px;">
+        <div class="form-group">
+          <label for="regUsername">Usuário</label>
+          <input type="text" id="regUsername" class="form-input" placeholder="letras e números" required minlength="3">
+        </div>
+        <div class="form-group">
+          <label for="regDisplayName">Nome de Exibição</label>
+          <input type="text" id="regDisplayName" class="form-input" placeholder="Como seus amigos verão você">
+        </div>
+        <div class="form-group">
+          <label for="regPassword">Senha (Mínimo 8 caracteres)</label>
+          <input type="password" id="regPassword" class="form-input" placeholder="••••••••" required minlength="8" maxlength="128">
+        </div>
+        <button type="submit" class="btn-modal-primary">Cadastrar Conta</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="js/crypto-helper.js"></script>
+  <script src="js/webrtc-streamer.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

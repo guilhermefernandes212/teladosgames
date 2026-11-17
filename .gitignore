@@ -1,0 +1,14 @@
+# Gerados automaticamente (dá para recriar)
+app/node_modules/
+dist/
+installer/staging/
+installer/portable/
+site/downloads/
+
+# Dados locais de teste: contas, sessões e chave privada do certificado
+app/data/
+app/certs/
+
+# Arquivos antigos e binários grandes de terceiros
+_antigo/
+vendor/*.exe

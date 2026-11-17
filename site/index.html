@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TelaDosGames • Sua party, todas as telas</title>
+  <meta name="description" content="TelaDosGames: app grátis para Windows. Você e o squad transmitem a tela ao mesmo tempo e conversam por voz. Rede local, VPN ou link pela internet.">
+  <meta property="og:title" content="TelaDosGames • Sua party, todas as telas">
+  <meta property="og:description" content="Todo mundo transmite, todo mundo assiste. Voz incluída. Grátis para Windows.">
+  <meta name="theme-color" content="#07080d">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #07080d;
+      --bg-2: #0d0f17;
+      --panel: #121522;
+      --panel-2: #181c2c;
+      --line: #252a40;
+      --line-hot: #3a2a2a;
+      --text: #eef0f8;
+      --soft: #a9afc6;
+      --muted: #6c7390;
+      --hot: #ff6a2b;
+      --hot-2: #ff3d6e;
+      --cyan: #2de2e6;
+      --lime: #9dff4a;
+      --live: #ff2d55;
+      --ink: #12060a;
+      --display: "Chakra Petch", "Segoe UI", system-ui, sans-serif;
+      --body: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+      --cut: 14px;
+      color-scheme: dark;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(900px 500px at 85% -10%, rgba(255, 61, 110, .16), transparent 60%),
+        radial-gradient(700px 500px at -10% 20%, rgba(45, 226, 230, .10), transparent 60%),
+        var(--bg);
+      color: var(--text);
+      font-family: var(--body);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    /* grade de fundo estilo HUD */
+    body::before {
+      content: ""; position: fixed; inset: 0; pointer-events: none; z-index: -1;
+      background-image:
+        linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: linear-gradient(to bottom, #000 0%, transparent 85%);
+    }
+    a { color: var(--cyan); }
+    .wrap { max-width: 1120px; margin: 0 auto; padding: 0 16px; }
+    .display { font-family: var(--display); text-transform: uppercase; letter-spacing: .02em; }
+
+    /* ---------- Topo ---------- */
+    header.top {
+      position: sticky; top: 0; z-index: 10;
+      background: rgba(7, 8, 13, .78); backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--line);
+    }
+    header.top .wrap { display: flex; align-items: center; justify-content: space-between; height: 64px; gap: 16px; }
+    .brand { display: flex; align-items: center; gap: 10px; color: var(--text); text-decoration: none; font-family: var(--display); font-weight: 700; font-size: 22px; letter-spacing: .04em; text-transform: uppercase; }
+    .brand .dos { color: var(--hot); font-size: .7em; margin: 0 2px; vertical-align: .12em; }
+    .brand svg { width: 30px; height: 30px; fill: var(--hot); filter: drop-shadow(0 0 8px rgba(255,106,43,.6)); }
+    nav.links { display: flex; gap: 26px; }
+    nav.links a { color: var(--soft); text-decoration: none; font-family: var(--display); font-weight: 600; font-size: 14px; letter-spacing: .08em; text-transform: uppercase; }
+    nav.links a:hover { color: var(--text); }
+
+    /* ---------- Botões angulados ---------- */
+    .btn {
+      --c: var(--hot);
+      position: relative; display: inline-flex; align-items: center; gap: 10px;
+      padding: 15px 26px; font-family: var(--display); font-weight: 700; font-size: 16px;
+      letter-spacing: .08em; text-transform: uppercase; text-decoration: none;
+      clip-path: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut));
+      transition: transform .15s, filter .15s, background .15s;
+    }
+    .btn svg { width: 20px; height: 20px; fill: currentColor; flex: none; }
+    .btn-hot { background: linear-gradient(100deg, var(--hot), var(--hot-2)); color: var(--ink); filter: drop-shadow(0 0 18px rgba(255, 61, 110, .45)); }
+    .btn-hot:hover { transform: translateY(-2px); filter: drop-shadow(0 0 28px rgba(255, 61, 110, .7)); }
+    .btn-line { background: var(--panel-2); color: var(--text); box-shadow: inset 0 0 0 1px var(--line); }
+    .btn-line:hover { background: #20253a; }
+    .btn-sm { padding: 10px 18px; font-size: 13px; --cut: 10px; }
+
+    /* ---------- Hero ---------- */
+    .hero { padding-top: 72px; padding-bottom: 64px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 56px; align-items: center; }
+    .tagline {
+      display: inline-flex; align-items: center; gap: 8px; margin-bottom: 18px;
+      font-family: var(--display); font-weight: 600; font-size: 13px; letter-spacing: .14em; text-transform: uppercase;
+      color: var(--lime); padding: 6px 12px; border: 1px solid rgba(157,255,74,.35); background: rgba(157,255,74,.06);
+    }
+    .tagline::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 10px var(--lime); animation: blink 1.6s infinite; }
+    h1 {
+      font-family: var(--display); text-transform: uppercase; font-weight: 700;
+      font-size: clamp(40px, 6.4vw, 72px); line-height: .98; margin: 0 0 20px; letter-spacing: -.01em;
+    }
+    h1 .grad { background: linear-gradient(95deg, var(--hot) 0%, var(--hot-2) 55%, #c04dff 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .lead { font-size: 18px; color: var(--soft); margin: 0 0 30px; max-width: 32em; }
+    .cta { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 26px; }
+    .chip { font-size: 13px; color: var(--soft); padding: 6px 12px; background: var(--panel); border: 1px solid var(--line); }
+    .chip b { color: var(--text); font-weight: 600; }
+
+    /* Mock do app: party com várias telas */
+    .rig { position: relative; }
+    .rig::before {
+      content: ""; position: absolute; inset: -24px; z-index: -1;
+      background: radial-gradient(closest-side, rgba(255,61,110,.28), transparent);
+      filter: blur(20px);
+    }
+    .hud {
+      background: linear-gradient(180deg, var(--panel-2), var(--panel));
+      border: 1px solid var(--line); padding: 14px;
+      clip-path: polygon(22px 0, 100% 0, 100% calc(100% - 22px), calc(100% - 22px) 100%, 0 100%, 0 22px);
+    }
+    .hud-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-family: var(--display); font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--soft); }
+    .hud-top .room { color: var(--text); font-weight: 700; }
+    .hud-top .room::before { content: "# "; color: var(--hot); }
+    .ping { color: var(--lime); }
+    .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .tile { position: relative; aspect-ratio: 16 / 10; overflow: hidden; border: 1px solid rgba(255,255,255,.06); }
+    /* "cenas de jogo" abstratas feitas só com gradiente */
+    .t1 { background:
+      linear-gradient(180deg, transparent 55%, #1b0f2e 55%),
+      radial-gradient(circle at 70% 35%, #ffb347 0 9%, transparent 10%),
+      linear-gradient(180deg, #ff5f6d, #6a2c91); }
+    .t2 { background:
+      repeating-linear-gradient(90deg, rgba(45,226,230,.18) 0 2px, transparent 2px 22px),
+      repeating-linear-gradient(0deg, rgba(45,226,230,.18) 0 2px, transparent 2px 22px),
+      linear-gradient(160deg, #04121f, #0a3a4a); }
+    .t3 { background:
+      radial-gradient(ellipse at 50% 120%, #2f7d32 0 45%, transparent 46%),
+      radial-gradient(circle at 25% 30%, #fff8 0 3%, transparent 4%),
+      linear-gradient(180deg, #7fd3ff, #2b6cb0); }
+    .t4 { background:
+      conic-gradient(from 200deg at 50% 60%, #ff3d6e, #c04dff, #2de2e6, #ff3d6e);
+      filter: saturate(.8) brightness(.75); }
+    .tile .crosshair { position: absolute; left: 50%; top: 50%; width: 18px; height: 18px; transform: translate(-50%,-50%); }
+    .tile .crosshair::before, .tile .crosshair::after { content: ""; position: absolute; background: #fff; opacity: .85; }
+    .tile .crosshair::before { left: 8px; top: 0; width: 2px; height: 18px; }
+    .tile .crosshair::after { top: 8px; left: 0; height: 2px; width: 18px; }
+    .tag-live {
+      position: absolute; top: 8px; left: 8px; font-family: var(--display); font-size: 11px; font-weight: 700; letter-spacing: .1em;
+      background: var(--live); color: #fff; padding: 2px 8px; display: flex; align-items: center; gap: 6px;
+    }
+    .tag-live::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #fff; animation: blink 1.2s infinite; }
+    .name {
+      position: absolute; left: 8px; bottom: 8px; font-size: 12px; font-weight: 600;
+      background: rgba(0,0,0,.6); padding: 2px 8px; display: flex; align-items: center; gap: 6px;
+    }
+    .name.talk { box-shadow: 0 0 0 2px var(--lime), 0 0 14px rgba(157,255,74,.6); }
+    .dock { display: flex; justify-content: center; gap: 10px; margin-top: 14px; }
+    .dock i { width: 38px; height: 38px; display: grid; place-items: center; background: var(--bg-2); border: 1px solid var(--line); font-style: normal; font-size: 16px; }
+    .dock i.on { background: linear-gradient(100deg, var(--hot), var(--hot-2)); border-color: transparent; }
+    .dock i.end { background: #3a1018; border-color: #5a1a25; }
+
+    /* ---------- Seções ---------- */
+    section { padding: 80px 0; position: relative; }
+    .sec-head { margin-bottom: 36px; }
+    .kicker { font-family: var(--display); font-weight: 600; font-size: 13px; letter-spacing: .18em; text-transform: uppercase; color: var(--hot); margin-bottom: 8px; }
+    h2 { font-family: var(--display); text-transform: uppercase; font-size: clamp(30px, 4.4vw, 44px); line-height: 1.05; margin: 0 0 10px; }
+    .sub { color: var(--soft); margin: 0; max-width: 42em; }
+
+    .card {
+      position: relative; background: linear-gradient(180deg, var(--panel-2), var(--panel)); border: 1px solid var(--line); padding: 24px;
+      clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 0 100%);
+      transition: border-color .2s, transform .2s;
+    }
+    .card:hover { border-color: #3a4266; transform: translateY(-3px); }
+    .card h3 { font-family: var(--display); text-transform: uppercase; letter-spacing: .03em; margin: 0 0 6px; font-size: 20px; }
+    .card p { margin: 0; color: var(--soft); font-size: 15px; }
+    .grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .grid2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .ico { font-size: 28px; line-height: 1; margin-bottom: 14px; }
+
+    /* Passos como fases */
+    .level { font-family: var(--display); font-weight: 700; font-size: 13px; letter-spacing: .14em; color: var(--cyan); margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+    .level .bar { flex: 1; height: 4px; background: var(--line); position: relative; }
+    .level .bar::after { content: ""; position: absolute; inset: 0; background: var(--cyan); box-shadow: 0 0 10px var(--cyan); }
+    .s1 .bar::after { width: 33%; } .s2 .bar::after { width: 66%; } .s3 .bar::after { width: 100%; background: var(--lime); box-shadow: 0 0 10px var(--lime); }
+    .s3 .level { color: var(--lime); }
+
+    /* Conexões com medidor */
+    .meter { display: flex; gap: 3px; margin-top: 16px; align-items: flex-end; }
+    .meter i { width: 6px; background: var(--line); display: block; }
+    .meter i:nth-child(1) { height: 6px; } .meter i:nth-child(2) { height: 10px; } .meter i:nth-child(3) { height: 14px; } .meter i:nth-child(4) { height: 18px; }
+    .meter i.on { background: var(--lime); box-shadow: 0 0 6px rgba(157,255,74,.6); }
+    .meter span { margin-left: 10px; font-size: 12px; color: var(--muted); font-family: var(--display); letter-spacing: .08em; text-transform: uppercase; }
+
+    /* ---------- Download ---------- */
+    .dl-wrap { border: 1px solid var(--line); background: linear-gradient(135deg, rgba(255,106,43,.08), rgba(192,77,255,.06) 60%, transparent); padding: 36px; clip-path: polygon(28px 0, 100% 0, 100% calc(100% - 28px), calc(100% - 28px) 100%, 0 100%, 0 28px); }
+    .dl .card { display: flex; flex-direction: column; gap: 14px; }
+    .dl .badge { align-self: flex-start; font-family: var(--display); font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink); background: var(--lime); padding: 3px 10px; }
+    .dl .meta { font-size: 13px; color: var(--muted); font-family: var(--display); letter-spacing: .06em; }
+    .dl .btn { align-self: flex-start; }
+    .notice { margin-top: 22px; padding: 18px 20px; background: var(--bg-2); border-left: 3px solid var(--hot); }
+    .notice strong { font-family: var(--display); text-transform: uppercase; letter-spacing: .04em; }
+    .notice p { margin: 6px 0 0; color: var(--soft); font-size: 15px; }
+    kbd { font-family: var(--display); font-size: 13px; background: var(--panel-2); border: 1px solid var(--line); border-bottom-width: 3px; padding: 1px 8px; color: var(--text); }
+    .req { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 22px; color: var(--muted); font-size: 14px; }
+    .req b { color: var(--soft); font-weight: 600; }
+
+    /* ---------- FAQ ---------- */
+    details { background: var(--panel); border: 1px solid var(--line); padding: 0 22px; margin-bottom: 10px; }
+    details[open] { border-color: #3a4266; }
+    summary { cursor: pointer; padding: 18px 0; font-weight: 600; list-style: none; display: flex; justify-content: space-between; gap: 16px; }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: "+"; font-family: var(--display); color: var(--hot); font-size: 22px; line-height: 1; }
+    details[open] summary::after { content: "−"; }
+    details p { margin: 0 0 18px; color: var(--soft); }
+
+    /* ---------- Faixa final ---------- */
+    .final { text-align: center; padding-top: 90px; padding-bottom: 90px; }
+    .final h2 { font-size: clamp(34px, 5.5vw, 60px); }
+    .final .cta { justify-content: center; margin-top: 26px; }
+
+    footer { border-top: 1px solid var(--line); padding: 28px 0 40px; color: var(--muted); font-size: 14px; }
+    footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+
+    @keyframes blink { 50% { opacity: .25; } }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+      html { scroll-behavior: auto; }
+    }
+    @media (max-width: 960px) {
+      .grid4 { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 860px) {
+      .hero { grid-template-columns: minmax(0, 1fr); padding-top: 44px; gap: 44px; }
+      .grid3, .grid2 { grid-template-columns: 1fr; }
+      nav.links { display: none; }
+      .dl-wrap { padding: 22px 16px; }
+      .rig::before { inset: -24px 0; }
+    }
+    @media (max-width: 520px) {
+      .grid4 { grid-template-columns: 1fr; }
+      .btn { padding: 14px 20px; font-size: 15px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="top">
+    <div class="wrap">
+      <a class="brand" href="#">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><path fill-rule="evenodd" d="M5 4h22a4 4 0 0 1 4 4v13a4 4 0 0 1-4 4H5a4 4 0 0 1-4-4V8a4 4 0 0 1 4-4Zm8 6.5v8l7-4-7-4Z"/><rect x="10" y="27" width="12" height="2.5" rx="1.25"/></svg>
+        <span>Tela<span class="dos">dos</span>Games</span>
+      </a>
+      <nav class="links">
+        <a href="#pra-que">Pra quê</a>
+        <a href="#como-funciona">Como funciona</a>
+        <a href="#duvidas">Dúvidas</a>
+      </nav>
+      <a class="btn btn-hot btn-sm" href="#baixar">Baixar</a>
+    </div>
+  </header>
+
+  <main>
+    <!-- HERO -->
+    <div class="wrap hero">
+      <div>
+        <span class="tagline">Grátis · Windows 10 e 11</span>
+        <h1>Sua party.<br><span class="grad">Todas as telas.</span></h1>
+        <p class="lead">O squad inteiro transmite a tela ao mesmo tempo e conversa por voz, numa sala só. Chama a galera pelo Wi-Fi de casa, pela VPN ou manda um link pela internet.</p>
+        <div class="cta">
+          <a class="btn btn-hot" href="downloads/TelaDosGames-Setup-1.0.0.exe" download>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 3h2v10.17l3.59-3.58L18 11l-6 6-6-6 1.41-1.41L11 13.17V3Zm-7 16h16v2H4v-2Z"/></svg>
+            Baixar grátis
+          </a>
+          <a class="btn btn-line" href="#como-funciona">Ver como funciona</a>
+        </div>
+        <div class="chips">
+          <span class="chip"><b>Várias telas</b> ao vivo</span>
+          <span class="chip"><b>Voz</b> com indicador de fala</span>
+          <span class="chip"><b>Amigos entram</b> pelo navegador</span>
+        </div>
+      </div>
+
+      <div class="rig" aria-hidden="true">
+        <div class="hud">
+          <div class="hud-top">
+            <span class="room">sala-do-squad</span>
+            <span class="ping">● 4 na call</span>
+          </div>
+          <div class="tiles">
+            <div class="tile t1"><span class="tag-live">AO VIVO</span><span class="name talk">Você</span></div>
+            <div class="tile t2"><span class="tag-live">AO VIVO</span><span class="crosshair"></span><span class="name">Lucas</span></div>
+            <div class="tile t3"><span class="tag-live">AO VIVO</span><span class="name talk">Bia</span></div>
+            <div class="tile t4"><span class="name">Rafa</span></div>
+          </div>
+          <div class="dock"><i class="on">🎙</i><i>🎧</i><i class="on">🖥</i><i>💬</i><i class="end">✕</i></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRA QUE -->
+    <section id="pra-que">
+      <div class="wrap">
+        <div class="sec-head">
+          <div class="kicker">// Pra quê serve</div>
+          <h2>Feito pra jogar junto</h2>
+          <p class="sub">Nada de ficar revezando quem compartilha. No TelaDosGames todo mundo abre a própria tela e todo mundo vê tudo.</p>
+        </div>
+        <div class="grid4">
+          <div class="card"><div class="ico">🤝</div><h3>Co-op</h3><p>Veja a tela do parceiro enquanto joga e combine a estratégia na voz.</p></div>
+          <div class="card"><div class="ico">🏆</div><h3>Desafio entre amigos</h3><p>Cada um transmite a própria partida e a galera acompanha quem está na frente.</p></div>
+          <div class="card"><div class="ico">⏱️</div><h3>Run ao vivo</h3><p>Mostre aquela speedrun ou o boss difícil pra galera assistir e comentar.</p></div>
+          <div class="card"><div class="ico">🏠</div><h3>LAN party</h3><p>Todo mundo na mesma rede: conexão direta, sem gastar internet.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- COMO FUNCIONA -->
+    <section id="como-funciona">
+      <div class="wrap">
+        <div class="sec-head">
+          <div class="kicker">// Tutorial</div>
+          <h2>Três fases e pronto</h2>
+          <p class="sub">Só quem cria a sala precisa do programa. O resto do squad entra pelo link.</p>
+        </div>
+        <div class="grid3">
+          <div class="card s1">
+            <div class="level">FASE 1 <span class="bar"></span></div>
+            <h3>Instala e abre</h3>
+            <p>Baixa, abre o TelaDosGames e clica em <strong>Abrir aplicativo</strong>. Cria uma sala com o nome que quiser.</p>
+          </div>
+          <div class="card s2">
+            <div class="level">FASE 2 <span class="bar"></span></div>
+            <h3>Chama o squad</h3>
+            <p>Clica em <strong>Copiar link direto</strong> e manda no grupo. O link já cai direto na sua sala.</p>
+          </div>
+          <div class="card s3">
+            <div class="level">FASE 3 <span class="bar"></span></div>
+            <h3>Todo mundo ao vivo</h3>
+            <p>A voz conecta sozinha. Cada um clica em <strong>Transmitir tela</strong> e pronto: todas as telas na sua frente.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONEXÕES -->
+    <section>
+      <div class="wrap">
+        <div class="sec-head">
+          <div class="kicker">// Conexão</div>
+          <h2>Escolhe teu servidor</h2>
+          <p class="sub">O TelaDosGames mostra todos os endereços na tela inicial. Usa o que combinar com onde a galera está.</p>
+        </div>
+        <div class="grid2">
+          <div class="card">
+            <div class="ico">🏠</div><h3>Mesma casa / Wi-Fi</h3>
+            <p>Pelo IP do roteador. O caminho mais curto possível, sem gastar internet.</p>
+            <div class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><span>Menor atraso</span></div>
+          </div>
+          <div class="card">
+            <div class="ico">🛡️</div><h3>VPN (Radmin, Hamachi)</h3>
+            <p>Conexão direta entre cidades diferentes, sem mexer no roteador.</p>
+            <div class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><span>Direto</span></div>
+          </div>
+          <div class="card">
+            <div class="ico">⚡</div><h3>Link pela internet</h3>
+            <p>Um link público gerado na hora. O mais fácil de todos: não precisa configurar nada.</p>
+            <div class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><span>1 clique</span></div>
+          </div>
+          <div class="card">
+            <div class="ico">🌐</div><h3>IP público</h3>
+            <p>Pra quem manja de abrir portas no roteador (3000 ou 8443).</p>
+            <div class="meter"><i class="on"></i><i class="on"></i><i></i><i></i><span>Avançado</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DOWNLOAD -->
+    <section id="baixar">
+      <div class="wrap">
+        <div class="dl-wrap">
+          <div class="sec-head">
+            <div class="kicker">// Download</div>
+            <h2>Bora jogar</h2>
+            <p class="sub">Escolhe um dos dois. Os dois são grátis e têm a mesma coisa dentro.</p>
+          </div>
+          <div class="grid2 dl">
+            <div class="card">
+              <span class="badge">Recomendado</span>
+              <div>
+                <h3>Instalador</h3>
+                <p>Instala em segundos, cria atalho na Área de Trabalho e dá pra desinstalar depois pelo Windows.</p>
+              </div>
+              <span class="meta">TelaDosGames-Setup-1.0.0.exe · 40 MB</span>
+              <a class="btn btn-hot" href="downloads/TelaDosGames-Setup-1.0.0.exe" download>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 3h2v10.17l3.59-3.58L18 11l-6 6-6-6 1.41-1.41L11 13.17V3Zm-7 16h16v2H4v-2Z"/></svg>
+                Baixar instalador
+              </a>
+            </div>
+            <div class="card">
+              <div>
+                <h3>Versão portátil</h3>
+                <p>Sem instalar: extrai o .zip numa pasta (ou pen drive) e abre o <strong>TelaDosGames.exe</strong>. Se o instalador não abrir no seu PC, use esta.</p>
+              </div>
+              <span class="meta">TelaDosGames-Portatil.zip · 57 MB</span>
+              <a class="btn btn-line" href="downloads/TelaDosGames-Portatil.zip" download>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 3h2v10.17l3.59-3.58L18 11l-6 6-6-6 1.41-1.41L11 13.17V3Zm-7 16h16v2H4v-2Z"/></svg>
+                Baixar .zip
+              </a>
+            </div>
+          </div>
+
+          <div class="notice">
+            <strong>Apareceu "O Windows protegeu o computador"?</strong>
+            <p>Normal pra programa novo sem assinatura digital paga. Clica em <kbd>Mais informações</kbd> e depois em <kbd>Executar assim mesmo</kbd>. Na primeira vez, quando o Firewall perguntar, clica em <kbd>Permitir</kbd>. Sem isso a galera não consegue entrar na sua sala.</p>
+          </div>
+
+          <div class="req">
+            <span><b>Sistema:</b> Windows 10 ou 11, 64 bits</span>
+            <span><b>Conta:</b> não precisa ser administrador</span>
+            <span><b>Amigos:</b> Chrome, Edge ou Firefox</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="duvidas">
+      <div class="wrap">
+        <div class="sec-head">
+          <div class="kicker">// FAQ</div>
+          <h2>Dúvidas</h2>
+        </div>
+        <details>
+          <summary>A galera precisa instalar também?</summary>
+          <p>Só quem cria a sala. Quem recebe o link entra direto pelo navegador (Chrome, Edge ou Firefox). Pra transmitir a tela pelo navegador, use o link que começa com https.</p>
+        </details>
+        <details>
+          <summary>Quantas pessoas podem transmitir ao mesmo tempo?</summary>
+          <p>Todo mundo da sala pode transmitir junto. O limite real é a internet e o PC de cada um: cada tela vai direto pra cada amigo. Pra squads grandes, prefira rede local ou VPN.</p>
+        </details>
+        <details>
+          <summary>Pesa no jogo?</summary>
+          <p>Transmitir a tela usa um pouco de processador e de upload. Em PC mais fraco ou internet lenta, vale deixar só quem está jogando transmitindo.</p>
+        </details>
+        <details>
+          <summary>É seguro?</summary>
+          <p>Vídeo e voz usam WebRTC, que é sempre criptografado. Senhas de conta e de sala são guardadas com Argon2id, e o app limita tentativas de senha. Manda o link só pra quem você quer na sala, ou coloca senha nela.</p>
+        </details>
+        <details>
+          <summary>Funciona no Mac, Linux ou celular?</summary>
+          <p>O programa que cria a sala é só pra Windows. Pelo celular ou outros sistemas dá pra entrar numa sala pelo navegador usando o link.</p>
+        </details>
+        <details>
+          <summary>Como desinstalar?</summary>
+          <p>Em Configurações → Aplicativos, procura "TelaDosGames" e clica em Desinstalar. Na versão portátil é só apagar a pasta.</p>
+        </details>
+      </div>
+    </section>
+
+    <!-- CHAMADA FINAL -->
+    <div class="wrap final">
+      <div class="kicker">// Player 2 entrou</div>
+      <h2>Chama o squad.</h2>
+      <p class="sub" style="margin: 0 auto;">Grátis, e quem entra pelo link não precisa criar conta.</p>
+      <div class="cta">
+        <a class="btn btn-hot" href="downloads/TelaDosGames-Setup-1.0.0.exe" download>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 3h2v10.17l3.59-3.58L18 11l-6 6-6-6 1.41-1.41L11 13.17V3Zm-7 16h16v2H4v-2Z"/></svg>
+          Baixar grátis
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <span>TelaDosGames · versão 1.0.0</span>
+      <span>Feito pra jogar e assistir junto.</span>
+    </div>
+  </footer>
+
+</body>
+</html>

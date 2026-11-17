@@ -1,0 +1,27 @@
+{
+  "name": "teladosgames",
+  "version": "1.0.0",
+  "description": "TelaDosGames: transmissão de várias telas ao mesmo tempo com voz, para jogar e assistir junto (WebRTC, HTTPS/WSS)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": [
+    "screen-share",
+    "webrtc",
+    "security",
+    "real-time",
+    "dtls-srtp",
+    "streaming"
+  ],
+  "author": "Antigravity Pair Programmer",
+  "license": "MIT",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^5.3.0",
+    "localtunnel": "^2.0.2",
+    "selfsigned": "^5.5.0",
+    "ws": "^8.22.0"
+  }
+}
